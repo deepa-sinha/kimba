@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-bubbly: "Fredoka", "Quicksand", system-ui, -apple-system, sans-serif;
+  --font-whimsical: var(--font-bubbly);
+
+  --app-bg: #FEF3F2;
+  --surface: #ffffff;
+  --surface-tint: #f1ecfe;
+  --green-tint: #edf8ee;
+  --pink-tint: #feecef;
+  --yellow-tint: #fef7e6;
+  --track: #eeebf5;
+
+  --text-primary: #2e2839;
+  --text-secondary: #7a728b;
+  --text-muted: #a49eb1;
+
+  --purple-primary: #8c71e6;
+  --purple-hover: #7a5ed8;
+  --green-accent: #3eae57;
+  --pink-accent: #f06484;
+  --yellow-accent: #efa236;
+
+  --border-subtle: #f0ebf5;
+  --border-ring: #cfc8dc;
+
+  --shadow-card: 0 4px 20px rgba(135, 115, 165, 0.06);
+  --shadow-fab: 0 8px 24px rgba(140, 113, 230, 0.35);
+  --shadow-nav: 0 -4px 20px rgba(135, 115, 165, 0.05);
+
+  --drawer-backdrop: rgba(46, 40, 57, 0.45);
+  --drawer-bg: #ffffff;
+  --drawer-handle: #b8a5e8;
+  --drawer-border: #e6e0f0;
+  --drawer-card: #f8f6fc;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --font-bubbly: var(--font-bubbly);
+  --font-whimsical: var(--font-whimsical);
+
+  --color-app: var(--app-bg);
+  --color-surface: var(--surface);
+  --color-surface-tint: var(--surface-tint);
+  --color-green-tint: var(--green-tint);
+  --color-pink-tint: var(--pink-tint);
+  --color-yellow-tint: var(--yellow-tint);
+  --color-track: var(--track);
+
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+
+  --color-purple-primary: var(--purple-primary);
+  --color-purple-hover: var(--purple-hover);
+  --color-green-accent: var(--green-accent);
+  --color-pink-accent: var(--pink-accent);
+  --color-yellow-accent: var(--yellow-accent);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-ring: var(--border-ring);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-fab: var(--shadow-fab);
+  --shadow-nav: var(--shadow-nav);
+
+  --radius-card: 24px;
+  --radius-pill: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+  font-family: var(--font-bubbly);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  min-height: 100dvh;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+@keyframes drawer-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.drawer-backdrop {
+  background-color: var(--drawer-backdrop);
+  animation: drawer-fade-in 0.2s ease-out;
+}
+
+.drawer-panel {
+  background-color: var(--drawer-bg);
+  animation: drawer-slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }

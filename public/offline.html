@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FEF3F2">
+  <title>Offline - Kimba</title>
+  <style>
+    :root {
+      --app-bg: #FEF3F2;
+      --surface: #ffffff;
+      --text-primary: #2e2839;
+      --text-secondary: #7a728b;
+      --purple-primary: #8c71e6;
+      --purple-hover: #7a5ed8;
+      --border-subtle: #f0ebf5;
+      --shadow-card: 0 4px 20px rgba(135, 115, 165, 0.08);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--app-bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .offline-card {
+      background-color: var(--surface);
+      border-radius: 1.5rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+      padding: 2rem 1.5rem;
+      max-width: 22rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .offline-icon-wrapper {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 9999px;
+      background-color: var(--app-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      color: var(--purple-primary);
+    }
+    .offline-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+    .offline-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .offline-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+    }
+    .offline-button {
+      background-color: var(--purple-primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 9999px;
+      padding: 0.75rem 1.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .offline-button:hover {
+      background-color: var(--purple-hover);
+    }
+    @media (max-width: 480px) {
+      .offline-card {
+        padding: 1.75rem 1.25rem;
+      }
+      .offline-title {
+        font-size: 1.125rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <div class="offline-icon-wrapper">
+      <svg class="offline-icon" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M213.92,210.62l-168-176a8,8,0,1,0-11.6,11l25.86,27.09A159.23,159.23,0,0,0,8,124a8,8,0,0,0,13.88,8,143.23,143.23,0,0,1,45.4-44.57L85,106.12a112.72,112.72,0,0,0-43.2,38.64,8,8,0,0,0,13.62,8.42A96.34,96.34,0,0,1,88,122.86l22.42,23.49A64.12,64.12,0,0,0,88,172a8,8,0,0,0,13.88,8,48,48,0,0,1,21.6-25.59l42.61,44.64a8,8,0,1,0,11.6-11L202.32,198.5l11.6,12.12ZM128,192a8,8,0,1,1-8-8A8,8,0,0,1,128,192Zm120-68a159.26,159.26,0,0,0-58.42-53.69,8,8,0,0,0-7.85,13.94,143.32,143.32,0,0,1,52.39,47.75,8,8,0,1,0,13.88-8Zm-40,24a111.45,111.45,0,0,0-40.35-37.49,8,8,0,1,0-7.79,14A95.53,95.53,0,0,1,194.22,156a8,8,0,0,0,13.78-8Zm-40,24a63.73,63.73,0,0,0-20.94-20.57,8,8,0,1,0-8.21,13.73A47.78,47.78,0,0,1,154.21,180a8,8,0,0,0,13.79-8Z"/>
+      </svg>
+    </div>
+    <h1 class="offline-title">You're currently offline</h1>
+    <p class="offline-desc">Your habits and tasks are saved locally on this device. Reconnect to sync any changes.</p>
+    <button class="offline-button" type="button" onclick="window.location.reload()">
+      Try again
+    </button>
+  </div>
+</body>
+</html>
+

@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
   turbopack: {
     rules: {
       "*.css": {
@@ -11,6 +9,7 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  allowedDevOrigins: ['192.168.0.110'],
 };
 
 export default nextConfig;
