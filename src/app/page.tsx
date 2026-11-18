@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useSyncExternalStore } from "react";
+import { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import Image from "next/image";
 import {
   Plant,
@@ -10,8 +10,6 @@ import {
   Heart,
   Sun,
   CaretRight,
-  CheckCircle,
-  Circle,
   Plus,
   House,
   Mountains,
@@ -19,15 +17,7 @@ import {
 } from "@phosphor-icons/react";
 import Drawer from "@/components/drawer";
 import AddTaskForm, { TaskFormData } from "@/components/add-task-form";
-import { motion } from "motion/react";
-
-interface TaskItem {
-  id: string;
-  title: string;
-  note?: string;
-  date?: string;
-  completed: boolean;
-}
+import SwipeableTaskItem, { TaskItem } from "@/components/swipeable-task-item";
 
 const STORAGE_KEY = "kimba_tasks";
 
@@ -56,6 +46,12 @@ function getServerSnapshot() {
 
 export default function Home() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [removedTask, setRemovedTask] = useState<{
+    task: TaskItem;
+    index: number;
+  } | null>(null);
+  const [statusMessage, setStatusMessage] = useState("");
+
   const tasksString = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const tasks = useMemo<TaskItem[]>(() => {
@@ -74,6 +70,14 @@ export default function Home() {
     const completed = rawList.filter((task) => task.completed);
     return [...unfinished, ...completed];
   }, [tasksString]);
+
+  useEffect(() => {
+    if (!removedTask) return;
+    const timeoutId = setTimeout(() => {
+      setRemovedTask(null);
+    }, 4000);
+    return () => clearTimeout(timeoutId);
+  }, [removedTask]);
 
   const saveTasks = (updatedTasks: TaskItem[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTasks));
@@ -96,6 +100,27 @@ export default function Home() {
       : [...unfinished, updatedTask, ...completed];
 
     saveTasks(updatedTasks);
+  };
+
+  const handleRemoveTask = (id: string) => {
+    const index = tasks.findIndex((task) => task.id === id);
+    const target = tasks[index];
+    if (!target) return;
+
+    const nextTasks = tasks.filter((task) => task.id !== id);
+    saveTasks(nextTasks);
+    setRemovedTask({ task: target, index });
+    setStatusMessage(`Task "${target.title}" removed`);
+  };
+
+  const handleUndo = () => {
+    if (!removedTask) return;
+    const nextTasks = [...tasks];
+    const targetIndex = Math.min(removedTask.index, nextTasks.length);
+    nextTasks.splice(targetIndex, 0, removedTask.task);
+    saveTasks(nextTasks);
+    setStatusMessage(`Task "${removedTask.task.title}" restored`);
+    setRemovedTask(null);
   };
 
   const handleAddTask = (formData: TaskFormData) => {
@@ -203,61 +228,39 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sun size={24} weight="regular" className="text-yellow-accent shrink-0" />
-              <h3 className="text-base sm:text-lg font-medium text-primary">Today&apos;s Tasks</h3>
+              <h3 id="tasks-heading" className="text-base sm:text-lg font-medium text-primary">
+                Today&apos;s Tasks
+              </h3>
             </div>
             <span className="text-sm sm:text-base font-normal text-secondary">
               {remainingCount} left
             </span>
           </div>
 
-          <div className="flex flex-col px-4 sm:px-5 bg-surface rounded-card border border-border-subtle shadow-card w-full">
-            {tasks.map((task, index) => {
-              const isLast = index === tasks.length - 1;
-              return (
-                <motion.div
+          <p role="status" className="sr-only">
+            {statusMessage}
+          </p>
+
+          {tasks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center gap-2 bg-surface rounded-card border border-border-subtle shadow-card w-full">
+              <Sparkle size={32} weight="fill" className="text-yellow-accent" />
+              <span className="text-base font-medium text-primary">All tasks completed!</span>
+              <span className="text-xs text-secondary font-normal">
+                Enjoy your day or add a new task with the + button.
+              </span>
+            </div>
+          ) : (
+            <ul role="list" aria-labelledby="tasks-heading" className="task-list">
+              {tasks.map((task) => (
+                <SwipeableTaskItem
                   key={task.id}
-                  layout
-                  transition={{
-                    type: "spring",
-                    stiffness: 350,
-                    damping: 28,
-                  }}
-                  onClick={() => handleToggleTask(task.id)}
-                  className="flex items-center gap-3.5 sm:gap-4 cursor-pointer"
-                >
-                  <div className="shrink-0 flex items-center justify-center">
-                    {task.completed ? (
-                      <CheckCircle
-                        size={24}
-                        weight="fill"
-                        className="text-green-accent shrink-0"
-                      />
-                    ) : (
-                      <Circle size={24} className="text-border-ring shrink-0" />
-                    )}
-                  </div>
-                  <div
-                    className={`flex flex-col flex-1 py-3.5 min-w-0 ${!isLast ? "border-b border-border-subtle" : ""
-                      }`}
-                  >
-                    <span
-                      className={`text-sm sm:text-base font-normal truncate transition-colors duration-200 ${task.completed
-                          ? "line-through text-secondary"
-                          : "text-primary"
-                        }`}
-                    >
-                      {task.title}
-                    </span>
-                    {task.note ? (
-                      <span className="text-xs text-secondary truncate font-normal">
-                        {task.note}
-                      </span>
-                    ) : null}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                  task={task}
+                  onToggle={handleToggleTask}
+                  onRemove={handleRemoveTask}
+                />
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="flex flex-col gap-2 w-full">
@@ -297,6 +300,21 @@ export default function Home() {
       >
         <AddTaskForm onSubmit={handleAddTask} />
       </Drawer>
+
+      {removedTask ? (
+        <div className="toast-container">
+          <span className="text-sm font-normal truncate pr-2">
+            Task &ldquo;{removedTask.task.title}&rdquo; removed
+          </span>
+          <button
+            type="button"
+            onClick={handleUndo}
+            className="toast-undo-btn"
+          >
+            Undo
+          </button>
+        </div>
+      ) : null}
 
       <nav className="fixed bottom-0 left-0 right-0 z-20 flex items-center justify-around pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-2 bg-surface border-t border-border-subtle shadow-nav max-w-lg mx-auto w-full">
         <button type="button" className="flex flex-1 flex-col items-center gap-1 py-1 px-1 rounded-xl bg-surface-tint text-purple-primary">
