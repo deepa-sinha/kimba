@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 
 interface FundsState {
   funds: number;
@@ -31,13 +31,13 @@ export const useFundsStore = create<FundsState>()(
   )
 );
 
+const emptySubscribe = () => () => {};
+
 export function useHydratedFunds(): number {
-  const [mounted, setMounted] = useState(false);
   const funds = useFundsStore((state) => state.funds);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return mounted ? funds : 25000;
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => funds,
+    () => 25000
+  );
 }

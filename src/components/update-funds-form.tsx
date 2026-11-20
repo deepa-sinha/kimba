@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFundsStore } from "@/store/funds-store";
 
 interface UpdateFundsFormProps {
@@ -13,10 +13,6 @@ export default function UpdateFundsForm({ onSuccess }: UpdateFundsFormProps) {
   const currentFunds = useFundsStore((state) => state.funds);
   const setFunds = useFundsStore((state) => state.setFunds);
   const [amount, setAmount] = useState<string>(String(currentFunds));
-
-  useEffect(() => {
-    setAmount(String(currentFunds));
-  }, [currentFunds]);
 
   const handleQuickAdd = (value: number) => {
     const numeric = parseFloat(amount) || 0;
@@ -73,4 +69,3 @@ export default function UpdateFundsForm({ onSuccess }: UpdateFundsFormProps) {
     </form>
   );
 }
-
