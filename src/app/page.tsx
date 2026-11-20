@@ -17,7 +17,9 @@ import {
 } from "@phosphor-icons/react";
 import Drawer from "@/components/drawer";
 import AddTaskForm, { TaskFormData } from "@/components/add-task-form";
+import UpdateFundsForm from "@/components/update-funds-form";
 import SwipeableTaskItem, { TaskItem } from "@/components/swipeable-task-item";
+import { useHydratedFunds } from "@/store/funds-store";
 
 const STORAGE_KEY = "kimba_tasks";
 
@@ -45,12 +47,14 @@ function getServerSnapshot() {
 }
 
 export default function Home() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState<"task" | "funds" | null>(null);
   const [removedTask, setRemovedTask] = useState<{
     task: TaskItem;
     index: number;
   } | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
+
+  const funds = useHydratedFunds();
 
   const tasksString = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -136,7 +140,7 @@ export default function Home() {
     const completed = tasks.filter((task) => task.completed);
 
     saveTasks([...unfinished, newTask, ...completed]);
-    setIsDrawerOpen(false);
+    setActiveDrawer(null);
   };
 
   const remainingCount = tasks.filter((task) => !task.completed).length;
@@ -199,16 +203,22 @@ export default function Home() {
         </header>
 
         <section className="flex gap-3 w-full">
-          <div className="flex flex-1 min-w-0 items-center justify-between p-3 sm:p-3.5 bg-green-tint rounded-card border-[3px] border-white shadow-card">
+          <button
+            type="button"
+            onClick={() => setActiveDrawer("funds")}
+            className="flex flex-1 min-w-0 items-center justify-between p-3 sm:p-3.5 bg-green-tint rounded-card border-[3px] border-white shadow-card text-left transition-all hover:opacity-90 active:scale-[0.99] cursor-pointer"
+          >
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <Wallet size={36} weight="duotone" className="text-green-accent shrink-0" />
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-normal text-primary truncate">My Funds</span>
-                <span className="text-base sm:text-lg font-medium text-green-accent truncate">₹25,000</span>
+                <span className="text-base sm:text-lg font-medium text-green-accent truncate">
+                  ₹{funds.toLocaleString("en-IN")}
+                </span>
               </div>
             </div>
             <CaretRight size={18} className="text-secondary shrink-0 ml-1" />
-          </div>
+          </button>
 
           <div className="flex flex-1 min-w-0 items-center justify-between p-3 sm:p-3.5 bg-pink-tint rounded-card border-[3px] border-white shadow-card">
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -286,7 +296,7 @@ export default function Home() {
 
       <button
         type="button"
-        onClick={() => setIsDrawerOpen(true)}
+        onClick={() => setActiveDrawer("task")}
         aria-label="Add new task"
         className="fixed bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+4.25rem)] right-4 sm:right-[max(1rem,calc(50%-15rem))] flex items-center justify-center w-14 h-14 rounded-full bg-purple-primary text-white shadow-fab z-30 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
       >
@@ -294,11 +304,26 @@ export default function Home() {
       </button>
 
       <Drawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        title="Add Task"
+        isOpen={activeDrawer !== null}
+        onClose={() => setActiveDrawer(null)}
+        title={
+          activeDrawer === "funds" ? (
+            <div className="flex items-center gap-2.5">
+              <Wallet size={28} weight="duotone" className="text-green-accent" />
+              <h2 className="text-xl sm:text-2xl font-medium text-primary">
+                Update Funds
+              </h2>
+            </div>
+          ) : (
+            "Add Task"
+          )
+        }
       >
-        <AddTaskForm onSubmit={handleAddTask} />
+        {activeDrawer === "funds" ? (
+          <UpdateFundsForm onSuccess={() => setActiveDrawer(null)} />
+        ) : (
+          <AddTaskForm onSubmit={handleAddTask} />
+        )}
       </Drawer>
 
       {removedTask ? (

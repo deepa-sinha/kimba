@@ -6,7 +6,7 @@ import { X } from "@phosphor-icons/react";
 interface DrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
+  title?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -53,9 +53,13 @@ export default function Drawer({
 
         <div className="flex items-center justify-between mb-4">
           {title ? (
-            <h2 className="text-xl sm:text-2xl font-medium text-primary">
-              {title}
-            </h2>
+            typeof title === "string" ? (
+              <h2 className="text-xl sm:text-2xl font-medium text-primary">
+                {title}
+              </h2>
+            ) : (
+              <div>{title}</div>
+            )
           ) : (
             <div />
           )}
